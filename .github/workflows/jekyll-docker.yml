@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '0 2 * * 1'  
+    - cron: '0 2 * * 1'  # Weekly scan on Mondays at 2 AM UTC
 
 jobs:
   codeql:
@@ -24,9 +24,9 @@ jobs:
     - name: 📦 Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
-        languages: javascript  # Adjust if needed
+        languages: javascript  # adjust based on your project
 
-    - name: 🏗️ Build (No-op for static site)
+    - name: 🏗️ No-op Build
       run: echo "No build step for static site"
 
     - name: 🔎 Perform CodeQL Analysis
@@ -35,13 +35,13 @@ jobs:
   build:
     name: 🔧 Build Jekyll Site
     runs-on: ubuntu-latest
-    needs: codeql  # Run only after CodeQL finishes
+    needs: codeql
 
     steps:
     - name: 🛒 Checkout code
       uses: actions/checkout@v4
 
-    - name: 🏗️ Build the site using jekyll/builder
+    - name: 🏗️ Build using jekyll/builder
       run: |
         docker run \
         -v ${{ github.workspace }}:/srv/jekyll \
@@ -49,30 +49,28 @@ jobs:
         jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
 
   sonarqube:
-      name: 🔎 SonarQube Scan
-      runs-on: ubuntu-latest
-      needs: build
+    name: 🔎 SonarQube Scan
+    runs-on: ubuntu-latest
+    needs: build
 
-      steps:
-      - name: 🛒 Checkout code
-        uses: actions/checkout@v4
+    steps:
+    - name: 🛒 Checkout code
+      uses: actions/checkout@v4
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          sonar: ${{ secrets.sonar }}
-          projectBaseDir: '.'   # adjust if your code isn't in repo root
-      # If self-hosted SonarQube, add:
-      # sonarHostUrl: 'https://your-sonarqube-server-url'
-
+    - name: 🔍 Run SonarQube Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      with:
+        sonarToken: ${{ secrets.SONAR }}
+        sonarHostUrl: 'http://localhost:9000/'  # ← Replace this with your actual SonarQube URL
+        projectBaseDir: '.'
 
   trivy:
     name: 🛡️ Trivy Scan
     runs-on: ubuntu-latest
-    needs: sonarqube  # Run after SonarQube scan completes
+    needs: sonarqube
 
     steps:
-    - name: 🧪 Trivy scan for jekyll/builder
+    - name: 🧪 Trivy image scan
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'image'
