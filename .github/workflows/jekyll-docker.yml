@@ -60,7 +60,7 @@ jobs:
     - name: 🔍 Run SonarQube Scan
       uses: SonarSource/sonarcloud-github-action@master
       with:
-        sonarToken: ${{ secrets.SONAR }}
+        sonar_Token: ${{ secrets.SONAR }}
         sonarHostUrl: 'http://localhost:9000/'  # ← Replace this with your actual SonarQube URL
         projectBaseDir: '.'
 
