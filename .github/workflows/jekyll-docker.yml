@@ -61,9 +61,11 @@ jobs:
       uses: sonarsource/sonarqube-scan-action@master
       with:
        projectBaseDir: .
+       args: >
+         -Dsonar.projectKey=mydemo-app
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-       # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+       #SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
 
   trivy:
