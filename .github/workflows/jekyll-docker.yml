@@ -49,20 +49,22 @@ jobs:
         jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
 
   sonarqube:
-    name: 🔎 SonarQube Scan
-    runs-on: ubuntu-latest
-    needs: build
+      name: 🔎 SonarQube Scan
+      runs-on: ubuntu-latest
+      needs: build
 
-    steps:
-    - name: 🛒 Checkout code
-      uses: actions/checkout@v4
+      steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
 
-    - name: SonarQube Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      with:
-        projectBaseDir: '.'   # adjust if your source is elsewhere
-        args: >
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          sonarToken: ${{ secrets.SONAR_TOKEN }}
+          projectBaseDir: '.'   # adjust if your code isn't in repo root
+      # If self-hosted SonarQube, add:
+      # sonarHostUrl: 'https://your-sonarqube-server-url'
+
 
   trivy:
     name: 🛡️ Trivy Scan
