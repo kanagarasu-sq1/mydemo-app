@@ -60,7 +60,7 @@ jobs:
       - name: SonarQube Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
-          sonarToken: ${{ secrets.SONAR_TOKEN }}
+          sonarToken: ${{ secrets.sonar }}
           projectBaseDir: '.'   # adjust if your code isn't in repo root
       # If self-hosted SonarQube, add:
       # sonarHostUrl: 'https://your-sonarqube-server-url'
