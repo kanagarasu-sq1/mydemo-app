@@ -22,8 +22,8 @@ jobs:
           -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
           jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
 
-  sonarqube:
-    name: 🔎 SonarQube Scan (Docker)
+  secret-scan:
+    name: 🔐 Secret Scan with Gitleaks
     runs-on: ubuntu-latest
     needs: build
 
@@ -31,8 +31,23 @@ jobs:
       - name: 🛒 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔍 Run SonarQube Scanner in Docker
-        env:
-         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        
+      - name: 🔍 Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source=. --verbose
 
+  snyk-scan:
+    name: 🛡️ Snyk Open Source Scan
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: 🛒 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛡️ Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
