@@ -94,8 +94,8 @@ jobs:
       - name: Snyk Security Scan
         uses: snyk/actions/node@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: test ./your-subdirectory --all-projects
+         args: test
 
 
