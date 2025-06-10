@@ -96,5 +96,6 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: test --all-projects
+          args: test ./your-subdirectory --all-projects
+
 
