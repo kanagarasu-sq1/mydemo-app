@@ -117,20 +117,7 @@ jobs:
             key: ${{ secrets.SERVER_KEY }}
             script: |
               echo "✅ Connected to EC2"
-
-              # Optional: login to Docker Hub (if private image)
-              # echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-              # Pull latest image from Docker Hub
-               docker pull ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
-
-            
-
-              # Run the new container
-                docker run -d \
-              --name myapp \
-              -p 80:80 \
-              ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+                 docker run -d --name myapp -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
 
 
 
