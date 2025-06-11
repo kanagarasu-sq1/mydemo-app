@@ -116,11 +116,16 @@ jobs:
             username: ${{ secrets.EC2_USER }}
             key: ${{ secrets.SERVER_KEY }}
             script: |
-              echo "✅ Connected to EC2"
-                 docker run -d \
-                  --name myapp \
-                     -p 80:80 \
-                       ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+              script: |
+               echo "✅ Connected to EC2"
+               echo "🔄 Pulling Docker image"
+               docker pull ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+               echo "🛑 Stopping old container (if any)"
+              docker stop myapp || true
+              docker rm myapp || true
+              echo "🚀 Starting new container"
+               docker run -d --name myapp -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
+              echo "✅ Deployment complete"
 
 
 
