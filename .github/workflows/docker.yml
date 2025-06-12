@@ -79,11 +79,14 @@ jobs:
     needs: sonarqube
 
     steps:
-      - name: Trivy scan for jekyll/builder
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'image'
-          image-ref: 'jekyll/builder:latest'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
+     - name: Checkout code
+       uses: actions/checkout@v4
+
+     - name: Trivy scan - Filesystem
+       uses: aquasecurity/trivy-action@master
+       with:
+        scan-type: 'fs'
+        scan-ref: '.'  
+        format: 'table'
+        severity: 'CRITICAL,HIGH'
+
