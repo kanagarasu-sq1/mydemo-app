@@ -1,4 +1,4 @@
-name: Jekyll site CI with Trivy and CodeQL
+name: SQ1SCAN5 
 
 on:
   push:
@@ -10,20 +10,20 @@ on:
 
 jobs:
   secret-scan:
-    name: 🔐 Secret Scan with Gitleaks
+    name: Secret Scan with Gitleaks
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛒 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔍 Run Gitleaks
+      - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
         with:
           args: detect --source=. --verbose
 
   codeql:
-    name: 🔍 CodeQL Scan
+    name: CodeQL Scan
     runs-on: ubuntu-latest
     needs: secret-scan
     permissions:
@@ -32,41 +32,41 @@ jobs:
       security-events: write
 
     steps:
-      - name: 🛒 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Initialize CodeQL
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: javascript  # Adjust if needed
 
-      - name: 🏗️ Build (No-op for static site)
+      - name: Build (No-op for static site)
         run: echo "No build step for static site"
 
-      - name: 🔎 Perform CodeQL Analysis
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
   sonarqube:
-      name: 🔍 SonarCloud Scan
+      name: SonarCloud Scan
       runs-on: ubuntu-latest
       needs: codeql
 
       steps:
-      - name: 🛒 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: ☕ Set up Java
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 📦 Install SonarScanner
+      - name: Install SonarScanner
         run: |
           curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
           unzip sonar-scanner.zip
 
-      - name: 🔍 Run SonarCloud Scanner
+      - name: Run SonarCloud Scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -77,32 +77,13 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN
 
-
-
-
-  build:
-    name: 🔧 Build Jekyll Site
+ trivy:
+    name: Trivy Scan
     runs-on: ubuntu-latest
-    needs: codeql
+    needs: sonarqube
 
     steps:
-      - name: 🛒 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🏗️ Build the site using jekyll/builder
-        run: |
-          docker run \
-            -v ${{ github.workspace }}:/srv/jekyll \
-            -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
-            jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
-
-  trivy:
-    name: 🛡️ Trivy Scan
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: 🧪 Trivy scan for jekyll/builder
+      - name: Trivy scan for jekyll/builder
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'image'
@@ -116,47 +97,9 @@ jobs:
         run: exit 1
 
    
-  push:
-        name: 📦 Build & Push Docker Image to Docker Hub
-        runs-on: ubuntu-latest
-        needs: build  # wait for your build stage
+  
 
-        steps:
-         - name: 🛒 Checkout code
-           uses: actions/checkout@v4
-
-         - name: 🔐 Log in to Docker Hub
-           run: |
-             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-         - name: 🚀 Push the Docker image
-           run: |
-             docker push ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
-
-  deploy:
-       name: 🚀 Deploy to EC2 Instance
-       runs-on: ubuntu-latest
-       needs: push  # Ensures it runs after docker image is pushed
-
-       steps:
-         - name: 🔐 SSH into EC2 and deploy
-           uses: appleboy/ssh-action@v1.0.0
-           with:
-            host: ${{ secrets.SERVER_IP }}
-            username: ${{ secrets.EC2_USER }}
-            key: ${{ secrets.SERVER_KEY }}
-            script: |
-              script: |
-               echo "✅ Connected to EC2"
-               echo "🔄 Pulling Docker image"
-               docker pull ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
-               echo "🛑 Stopping old container (if any)"
-              docker stop myapp || true
-              docker rm myapp || true
-              echo "🚀 Starting new container"
-               docker run -d --name myapp -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/myapp:latest
-              echo "✅ Deployment complete"
-
+  
 
 
 
