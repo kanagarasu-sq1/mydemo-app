@@ -79,14 +79,10 @@ jobs:
     needs: sonarqube
 
     steps:
-     - name: Checkout code
-       uses: actions/checkout@v4
-
-     - name: Trivy scan - Filesystem
-       uses: aquasecurity/trivy-action@master
-       with:
-        scan-type: 'fs'
-        scan-ref: '.'  
-        format: 'table'
-        severity: 'CRITICAL,HIGH'
+      - name: Trivy scan - Filesystem
+        uses: aquasecurity/trivy-action@master
+        with:
+         scan-type: 'fs'
+         scan-ref: '.'  
+        
 
