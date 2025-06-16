@@ -3,10 +3,10 @@ name: Security-Quliat check
 on:
   push:
     branches:
-      - dev
+      - circleci-project-setup
   pull_request:
     branches:
-      - dev
+      - circleci-project-setup
 
 
 jobs:
