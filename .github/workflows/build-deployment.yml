@@ -1,4 +1,4 @@
-name: Jekyll site CI with Trivy and CodeQL
+name: CI with Trivy and CodeQL
 
 on:
   push:
