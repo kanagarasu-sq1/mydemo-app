@@ -1,12 +1,11 @@
-name: SQ1SCAN5
+name: Security-Quliat check
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
-  schedule:
-    - cron: '0 2 * * 1'  # Weekly scan on Mondays at 2 AM UTC
+    branches: [ "master" ]
+  
 
 jobs:
   secret-scan:
