@@ -2,11 +2,12 @@ name: Security-Quliat check
 
 on:
   push:
-    branches: 
-      - circleci-project-setup
+    branches:
+      - dev
   pull_request:
     branches:
-      - circleci-project-setup
+      - dev
+
 
 jobs:
   secret-scan:
