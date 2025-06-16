@@ -4,6 +4,8 @@ This repository contains a robust CI/CD pipeline for a **Jekyll static site** us
 
 ---
 
+![image](https://github.com/user-attachments/assets/5b2813a5-f493-4665-8964-77359b5be93a)
+
 ## 📋 Workflow Overview
 
 ### 🔐 1. Secret Scan with Gitleaks
