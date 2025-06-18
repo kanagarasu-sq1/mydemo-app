@@ -2,9 +2,9 @@ name: CI with Trivy and CodeQL
 
 on:
   push:
-    branches: [ "circleci-project-setup" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "circleci-project-setup" ]
+    branches: [ "master" ]
   
 
 jobs:
