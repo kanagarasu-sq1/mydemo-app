@@ -1,55 +1,41 @@
-name: CI with Trivy and CodeQL
+name: Code Scan
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-  
+  workflow_call:
 
 jobs:
-  secret-scan:
-    name: Secret Scan with Gitleaks
+  scan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 🔄 Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      # Optional: Gitleaks secret scanning (commented out)
+      # - name: 🔐 Secret Scan with Gitleaks
+      #   uses: gitleaks/gitleaks-action@v2
+      #   env:
+      #     GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: 🔐 Secret Scan with TruffleHog
+        uses: trufflesecurity/trufflehog@main
         with:
-          args: detect --source=. --verbose
+          path: .
+          output: trufflehog-results.json
 
-  
-  sonarqube:
-      name: SonarCloud Scan
-      runs-on: ubuntu-latest
-      
-
-      steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: 🛡️ Vulnerability Scan with Trivy
+        uses: aquasecurity/trivy-action@master
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          scan-type: fs
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
 
-      
-      - name: Run SonarCloud Scanner
+      - name: 📊 Code Quality Scan with SonarCloud
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+            -Dsonar.host.url=https://sonarcloud.io
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
-            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=$SONAR_TOKEN
-
-
-
-
-  
