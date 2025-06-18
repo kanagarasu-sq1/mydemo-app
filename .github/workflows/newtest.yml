@@ -1,0 +1,55 @@
+name: CI with Trivy and CodeQL
+
+on:
+  push:
+    branches: [ "circleci-project-setup" ]
+  pull_request:
+    branches: [ "circleci-project-setup" ]
+  
+
+jobs:
+  secret-scan:
+    name: Secret Scan with Gitleaks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source=. --verbose
+
+  
+  sonarqube:
+      name: SonarCloud Scan
+      runs-on: ubuntu-latest
+      
+
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      
+      - name: Run SonarCloud Scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN
+
+
+
+
+  
