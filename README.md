@@ -1,4 +1,4 @@
-# 🧪 CI/CD Pipeline with Trivy, CodeQL, SonarCloud & Docker Deploy.
+# 🧪 CI/CD Pipeline with Trivy, CodeQL, SonarCloud & Docker Deploy..
 
 This repository contains a robust CI/CD pipeline for a **Jekyll static site** using **GitHub Actions**. The workflow includes security scans, code analysis, Docker image management, and automatic deployment to an **EC2 instance**.
 
